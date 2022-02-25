@@ -1,0 +1,20 @@
+{
+    //////CONJUNTOS
+    CONJ:numero->0 ~ 9;
+    CONJ:letra->a ~ z;
+    CONJ:otros->0 , 2 , 4 , 6;
+    CONJ:caracteres-> \ ~ ^;
+
+    <!AQUI VA UN COMENTARIO!>
+    
+    //////EXPRESIONES REGULARES
+    Expresion1->*{numero};
+    Expresion2->.*{letra}?{numero};
+    RegExp3->.{digito}*|" "|{letra}{digito};
+    %%
+    %%
+
+    Expresion1:"948398";
+    Expresion1:"deseo";
+    Expresion2:"jaja2";
+}

@@ -1,0 +1,131 @@
+|PorCiento VAL_RANGO
+                |PorCiento
+                |LlaveA VAL_RANGO
+                |LlaveA
+                |LlaveC VAL_RANGO
+                |LlaveC
+                |Or VAL_RANGO
+                |Or
+                |DosPuntos VAL_RANGO
+                |DosPuntos
+                |PuntoComa VAL_RANGO
+                |PuntoComa
+                |coma VAL_RANGO
+                |coma
+
+
+
+
+
+import java.util.LinkedList;
+parser code
+{:
+    public static LinkedList<TError> TablaEL=new LinkedList<TError>();
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+      
+        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+
+        Errores aux = new Errores("Sintactico",lexema,"Caracter no esperado",fila,columna);
+        ListaErrores.add(aux);        
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+        
+        Errores aux = new Errores(lexema,fila,columna,"SINTACTICO", "Caracter no esperado");
+        ListaErrores.add(aux);     
+    }
+:}
+
+java -jar jflex-full-1.7.0.jar Lexico.jflex
+java -jar java-cup-11b.jar -parser Analizador_Sintactico -symbols Simbolos Sintactico.cup
+
+
+
+
+import java.util.LinkedList;
+
+
+terminal numero;
+terminal coma ;
+terminal DosPuntos ;
+terminal PuntoComa;
+terminal guion;
+terminal flecha;
+terminal InterrogacionC;
+terminal Asterisco;
+terminal Mas;
+terminal Or;
+terminal CONJ;
+terminal AdmiracionC;
+terminal MayorQue;
+terminal MenorQue;
+terminal LlaveA;
+terminal LlaveC;
+terminal id;
+terminal Cadena;
+terminal comentarioMulti;
+terminal comentario;
+terminal ASSCI;
+terminal letra;
+
+
+
+non terminal INICIO, LISTA_INSTRUCCION, INSTRUCCION, LISTA_INSTRUCCION2, INS_CONJ,  INS_EXP, INS_SEPARACION, INS_CREACION,CONJUNTO,REPETICION, VALOR;
+
+start with INICIO;
+
+
+
+
+
+INICIO::= LlaveA LISTA_INSTRUCCION LlaveC{:System.out.println("FIN DE ANALISIS");:}
+;
+
+LISTA_INSTRUCCION::=  INSTRUCCION LISTA_INSTRUCCION2
+;
+
+LISTA_INSTRUCCION2 ::= INSTRUCCION LISTA_INSTRUCCION2
+;
+
+INSTRUCCION::= INS_CONJ
+            |INS_EXP
+            |INS_SEPARACION
+            |INS_CREACION
+;
+
+INS_CONJ::= CONJ DosPuntos id flecha CONJUNTO PuntoComa
+;
+
+CONJUNTO::= VALOR guion VALOR PuntoComa 
+        | REPETICION PuntoComa
+;
+
+VALOR::= ASSCI
+        |numero
+        |id
+;
+
+REPETICION::= REPETICION coma id
+            | id
+;
+
+INS_EXP::= id DosPuntos Cadena PuntoComa 
+;        

@@ -1,0 +1,233 @@
+package Analizadores;
+import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+
+
+parser code
+{:
+    public static LinkedList<Token> CONJUNTOS = new LinkedList<Token>(); 
+    public static LinkedList<Token> EXPRESIONES = new LinkedList<Token>(); 
+    public static LinkedList<Token> PRUEBAS = new LinkedList<Token>(); 
+    public static LinkedList<TError> errores = new LinkedList<TError>(); 
+
+    public static String Conjunto="";
+    public static String tipo="Lista";
+
+
+    //Metodo al que se llama automaticamente ante algun error sintactico
+    public void syntax_error(Symbol s)
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+      
+        System.out.println("!!!!!!! Error Sintactico Recuperado !!!!!!!");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+
+        TError tmp = new TError("Sintactico",lexema,"Caracter no esperado",fila,columna);
+        errores.add(tmp);
+        
+    }
+
+    //Metodo al que se llama en el momento en que ya no es posible una recuperacion de errores
+    public void unrecovered_syntax_error(Symbol s) throws java.lang.Exception
+    {        
+        String lexema = s.value.toString();
+        int fila = s.right;
+        int columna = s.left;
+        
+        System.out.println("!!!!!!! Error Sintactico, Panic Mode !!!!!!! ");
+        System.out.println("\t\tLexema: "+lexema);
+        System.out.println("\t\tFila: "+fila);
+        System.out.println("\t\tColumna: "+columna);
+        
+        TError tmp = new TError("Sintactico",lexema, "TOKEN NO ERA EL ESPERADO",fila,columna);
+        errores.add(tmp);
+     
+    }
+:}
+
+
+terminal numero;
+terminal coma, Punto ;
+terminal DosPuntos ;
+terminal PuntoComa;
+terminal guion;
+terminal flecha;
+terminal InterrogacionC;
+terminal Asterisco;
+terminal Mas;
+terminal Or;
+terminal CONJ;
+terminal AdmiracionC;
+terminal MayorQue;
+terminal MenorQue;
+terminal LlaveA;
+terminal LlaveC;
+terminal PorCiento;
+terminal id;
+terminal Cadena;
+terminal comentarioMulti;
+terminal comentario;
+terminal ASSCI;
+
+
+
+non terminal INICIO,  INSTRUCCION, INS_CONJ,  INS_EXP, INS_SEPARACION,INS_CREACION, CONJUNTOS, VAL_RANGO, LISTA_CREACION;
+
+start with INICIO;
+
+INICIO::= LlaveA INSTRUCCION {:System.out.println("FIN DE ANALISIS");:}
+;
+
+
+
+INSTRUCCION::= INS_CONJ INSTRUCCION
+            |INS_EXP INSTRUCCION
+            |INS_SEPARACION INSTRUCCION
+            |INS_CREACION INSTRUCCION
+            |LlaveC
+;
+
+INS_CREACION::= id flecha LISTA_CREACION PuntoComa
+;
+
+LISTA_CREACION::=LlaveA id LlaveC LISTA_CREACION
+                |LlaveA id LlaveC 
+                |Cadena LISTA_CREACION
+                |Cadena
+                |Punto LISTA_CREACION
+                |Mas LISTA_CREACION
+                |Or LISTA_CREACION
+                |InterrogacionC LISTA_CREACION
+                |Asterisco LISTA_CREACION
+;
+
+INS_SEPARACION::= PorCiento PorCiento
+;
+
+
+INS_CONJ::= CONJ DosPuntos id:a flecha CONJUNTOS PuntoComa:b   
+    {:
+        Token tmp = new Token("id",a.toString());
+        CONJUNTOS.add(tmp);
+        tmp = new Token("VALORES",tipo+","+Conjunto);
+        CONJUNTOS.add(tmp);
+        Conjunto="";
+        tipo="Lista";
+        tmp = new Token("PuntoComa",b.toString());
+        CONJUNTOS.add(tmp);
+    :}
+;
+
+CONJUNTOS::= VAL_RANGO
+;
+
+VAL_RANGO::=    numero:a{:
+        Conjunto+=a.toString();
+    :}
+                | numero:a VAL_RANGO   {:
+        Conjunto+=a.toString();
+    :} 
+                | id:a{:
+        Conjunto+=a.toString();
+    :}
+                | id:a VAL_RANGO{:
+        Conjunto+=a.toString();
+    :}
+                | ASSCI:a{:
+        Conjunto+=a.toString();
+    :}
+                | ASSCI:a VAL_RANGO {:
+        Conjunto+=a.toString();
+
+    :}
+                | coma:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                | guion:a VAL_RANGO {:
+        Conjunto+=a.toString();
+        tipo="Rango";
+    :}
+                |InterrogacionC:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |InterrogacionC:a {:
+        Conjunto+=a.toString();
+    :}
+                |Asterisco:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |Asterisco:a {:
+        Conjunto+=a.toString();
+        
+    :}
+                |Punto:a VAL_RANGO {:
+        Conjunto+=a.toString();
+        
+    :}
+                |Punto:a {:
+        Conjunto+=a.toString();
+        
+    :}
+                |MenorQue:a VAL_RANGO {:
+        Conjunto+=a.toString();
+        
+    :}
+                |MenorQue:a {:
+        Conjunto+=a.toString();
+        
+    :}
+                |MayorQue:a VAL_RANGO {:
+        Conjunto+=a.toString();
+        
+    :}
+                |MayorQue:a {:
+        Conjunto+=a.toString();
+
+    :}
+                |PorCiento:a VAL_RANGO {:
+        Conjunto+=a.toString();
+
+    :}
+                |PorCiento:a {:
+        Conjunto+=a.toString();
+    :}
+                |LlaveA:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |LlaveA:a {:
+        Conjunto+=a.toString();
+
+    :}
+                |LlaveC:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |LlaveC :a {:
+        Conjunto+=a.toString();
+    :}
+                |Or:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |Or:a {:
+        Conjunto+=a.toString();
+    :}
+                |DosPuntos:a VAL_RANGO {:
+        Conjunto+=a.toString();
+    :}
+                |DosPuntos:a {:
+        Conjunto+=a.toString();
+    :}
+;
+
+INS_EXP::= id:a DosPuntos Cadena:b PuntoComa:c  {: 
+                Token tmp = new Token("id",a.toString());
+                PRUEBAS.add(tmp);
+                tmp = new Token("Cadena",b.toString());
+                PRUEBAS.add(tmp);
+                tmp = new Token("PuntoComa",c.toString());
+                PRUEBAS.add(tmp);
+                                                :}  
+;
