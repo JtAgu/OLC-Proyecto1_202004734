@@ -1,21 +1,3 @@
-|PorCiento VAL_RANGO
-                |PorCiento
-                |LlaveA VAL_RANGO
-                |LlaveA
-                |LlaveC VAL_RANGO
-                |LlaveC
-                |Or VAL_RANGO
-                |Or
-                |DosPuntos VAL_RANGO
-                |DosPuntos
-                |PuntoComa VAL_RANGO
-                |PuntoComa
-                |coma VAL_RANGO
-                |coma
-
-
-
-
 
 import java.util.LinkedList;
 parser code
@@ -129,3 +111,19 @@ REPETICION::= REPETICION coma id
 
 INS_EXP::= id DosPuntos Cadena PuntoComa 
 ;        
+
+
+
+
+.[a-z]*|"_"|[a-z][0-9];
+.[a-z] * | "_" ([a-z] | [0-9]) ;
+.[a-z] * "_" | ([a-z] | [0-9]) ;
+.[a-z] * ( "_" | ([a-z] | [0-9]) ) ;
+.[a-z] ( "_" | ( [a-z] | [0-9] ) ) * ;
+[a-z] . ("_" | ( [a-z] | [0-9] ) ) * ;
+
+
+
+.a|*|a|bc a
+
+a.(b|c|d)*|a

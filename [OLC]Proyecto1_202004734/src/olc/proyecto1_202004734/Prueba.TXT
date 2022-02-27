@@ -1,20 +1,22 @@
 {
-    //////CONJUNTOS
-    CONJ:numero->0 ~ 9;
-    CONJ:letra->a ~ z;
-    CONJ:otros->0 , 2 , 4 , 6;
-    CONJ:caracteres-> \ ~ ^;
+	//////// CONJUNTOS
+	
+	CONJ: letra -> a,b,c,';
+	CONJ: digito -> <~>;
+	CONJ: mamada-> 1;
 
-    <!AQUI VA UN COMENTARIO!>
-    
-    //////EXPRESIONES REGULARES
-    Expresion1->*{numero};
-    Expresion2->.*{letra}?{numero};
-    RegExp3->.{digito}*|" "|{letra}{digito};
-    %%
-    %%
+	////// EXPRESIONES REGULARES
 
-    Expresion1:"948398";
-    Expresion1:"deseo";
-    Expresion2:"jaja2";
+	
+	ExpresionReg2 -> .+{digito}."."+{digito};
+	RegExp3 -> .{digito}+"CADENA"+*|"_"|?+{letra}{digito};
+	
+	%%
+	%%
+
+	ExpReg1 : "primerLexemaCokoa";
+	ExpresionReg2 : "34.44";
+	
+	<! aqui puede ir lo que sea !>
+
 }

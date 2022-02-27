@@ -24,11 +24,9 @@ public class Simbolos {
   public static final int Cadena = 21;
   public static final int EOF = 0;
   public static final int id = 20;
-  public static final int ASSCI = 24;
-  public static final int comentarioMulti = 22;
+  public static final int ASSCI = 22;
   public static final int CONJ = 13;
   public static final int error = 1;
-  public static final int comentario = 23;
   public static final int Punto = 4;
   public static final int MenorQue = 16;
   public static final int PuntoComa = 6;
@@ -56,8 +54,6 @@ public class Simbolos {
   "PorCiento",
   "id",
   "Cadena",
-  "comentarioMulti",
-  "comentario",
   "ASSCI"
   };
 }

@@ -8,10 +8,12 @@ package olc.proyecto1_202004734;
 import Analizadores.Analizador_Sintactico;
 import Analizadores.Analizador_Lexico;
 import Analizadores.TError;
+import Analizadores.Token;
 /**
  *
  * @author justin
  */
+import javax.swing.JScrollPane;
 import Analizadores.Analizador_Lexico;
 import Analizadores.Analizador_Sintactico;
 import java.awt.Color;
@@ -19,10 +21,17 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Stack;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -30,12 +39,22 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 public class Interfaz extends JFrame implements ActionListener {
 
+    
+    ArrayList <Expresiones> ExpNormales=new ArrayList <Expresiones>();
+    ArrayList <Expresiones> ExpPolacas=new ArrayList <Expresiones> ();
     Analizador_Lexico lexico;
     Analizador_Sintactico sintactico;
-    
-    String contenido = "";
+    ArrayList ExpRegex=new ArrayList();
+    String contenido = "",NombreArchivo;
     boolean Errores=true;
+    public static LinkedList<Token> CONJUNTOS;
+    public static LinkedList<Token> EXPRESIONES;
+    public static LinkedList<Token> PRUEBAS;
+    public static LinkedList<TError> ErroresLex;
+    public static LinkedList<TError> ErroresSintact;
+    public static LinkedList<String> CARACTERES;
     
+    JScrollPane scroll =new JScrollPane();
     JButton bAbrir, bGuardar, bGuardarComo, bJSON, GenAutomata, bAnalizar, bVisualizar, bBack, bNext;
     JTree TArchivos;
     DefaultMutableTreeNode treee, transition, next, Automatas;
@@ -165,11 +184,16 @@ public class Interfaz extends JFrame implements ActionListener {
 
         //PROGRAMANDO AREAS DE INTERFAZ
         ta = new JTextArea();
-        ta.setBounds(10, 80, 430, 270);
-        ta.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-        this.add(ta);
+        ta.setLineWrap(true);
+        ta.setWrapStyleWord(true);
+        JScrollPane sp3 = new JScrollPane(ta);
+        
+        sp3.setBounds(10, 80, 430, 270);
+        sp3.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+        this.add(sp3);
 
         TaSalida = new JTextArea();
+        JScrollPane sp2 = new JScrollPane(TaSalida);
         TaSalida.setBounds(10, 440, 930, 170);
         TaSalida.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         this.add(TaSalida);
@@ -200,13 +224,13 @@ public class Interfaz extends JFrame implements ActionListener {
             }
 
         } else if (e.getSource() == bGuardar) {
-
+            Guardar();
         } else if (e.getSource() == bJSON) {
 
         } else if (e.getSource() == bGuardarComo) {
-
+            GuardarComo();
         } else if (e.getSource() == GenAutomata) {
-
+            GenerarAutomatasAFND();
         } else if (e.getSource() == bBack) {
 
         } else if (e.getSource() == bNext) {
@@ -216,42 +240,292 @@ public class Interfaz extends JFrame implements ActionListener {
         }
 
     }
+    
+    
+    public void GenerarAutomatasAFND(){
+        int c=0;
+        while(c<ExpPolacas.size()){
+            Dot(ExpPolacas.get(c).DotAFND(),ExpPolacas.get(c).getNombre()+"_AFND");
+            c++;
+        }
+        
+    }
+    
+    
+      public static void Dot(String contenido, String Clave) {
+        ProcessBuilder pbuilder;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFND_202004734\\"+Clave + ".dot"));
+            bw.write(contenido);
+            bw.close();
+            pbuilder = new ProcessBuilder("dot", "-Tpng", "-o", "C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFND_202004734\\"+Clave + ".png", "C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFND_202004734\\"+Clave + ".dot");
+            pbuilder.redirectErrorStream(true);
+            pbuilder.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
+    public void GuardarComo(){
+        String contenidoNuevo=ta.getText();
+        String NombreNuevo=JOptionPane.showInputDialog(this, "INGRESA NOMBRE DE ARCHIVO", "GUARDAR COMO", JOptionPane.INFORMATION_MESSAGE);;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(NombreNuevo+".exp"));
+            bw.write(contenidoNuevo);
+            bw.close();
+            JOptionPane.showMessageDialog(this, "ARCHIVO GUARDADO", "GUARDAR", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 
+    
+    public void Guardar(){
+        String contenidoNuevo=ta.getText();
+        String NombreNuevo="";
+        if (contenido==""){
+            NombreNuevo=JOptionPane.showInputDialog(this, "INGRESA NOMBRE DE ARCHIVO", "GUARDAR COMO", JOptionPane.INFORMATION_MESSAGE);;
+        }
+        try {
+            BufferedWriter bw=null;
+            if(contenido!=""){
+                 bw = new BufferedWriter(new FileWriter(""+archivo));
+            }else{
+                 bw = new BufferedWriter(new FileWriter(""+NombreNuevo+".exp"));
+            }
+            bw.write(contenidoNuevo);
+            bw.close();
+            JOptionPane.showMessageDialog(this, "ARCHIVO GUARDADO", "QUE GRANDE QUE SOS AGUA DE MEYAN", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     public void Analizar() {
         try {
             lexico = new Analizador_Lexico(new BufferedReader(new FileReader(archivo)));
             sintactico = new Analizador_Sintactico(lexico);
             sintactico.parse();
-            System.out.println("\n\n***Reporte de errores encontrados ");
 
             if (lexico.errores.size() > 0 || sintactico.errores.size() > 0) {
                 contenido = "";
                 JOptionPane.showMessageDialog(this, "GENERANDO REPORTE DE ERRORES", "ERROR ENCONTRADO", WARNING_MESSAGE);
                 ReporteErrores();
+                Errores=true;
             }else{
                 Errores=false;
-                ObtenerDatos();
+                ErroresLex=lexico.errores;
+                ErroresSintact=sintactico.errores;
+                CONJUNTOS=sintactico.CONJUNTOS;
+                EXPRESIONES=sintactico.EXPRESIONES;
+                PRUEBAS=sintactico.PRUEBAS;
+                Transformar();
+                NombreArchivo=archivo.getName();
             }
         } catch (Exception e) {
         }
     }
     
-    public void ObtenerDatos(){
-        System.out.println("CONJUNTOS");
-        for(int i=0;i<sintactico.CONJUNTOS.size();i++){
-            System.out.println(sintactico.CONJUNTOS.get(i).getLexema());
+    public void Transformar(){
+        int c=0;
+        int i=0, estado=0,NumOperadores=0,adder=0;
+        ArrayList  Expresion = new ArrayList(); 
+        ArrayList ExpresionPrueba = new ArrayList(); 
+        ArrayList ExpresionPolaca = new ArrayList(); 
+        String LexemaActual="",Nombre="",LexemaAnterior="",LexemaGuardado="";
+        while(c<EXPRESIONES.size()){
+            
+            Token aux=EXPRESIONES.get(c);
+            if(aux.getTipo()=="id"){
+                Nombre = aux.getLexema();
+            }
+            i = 0;
+            if (aux.getSize() > 0) {
+                int operador=0;
+                while (aux.getSize() > i) {
+                    TokenCaracterCambio nuevo=new TokenCaracterCambio(aux.getCaracter(i),false);
+                    System.out.println(nuevo.Caracter.getLexema()+"   "+nuevo.Caracter.getOperador());
+                    if(aux.getCaracter(i).getOperador()){
+                        operador++;
+                    }
+                    Expresion.add(0,nuevo);
+                    ExpresionPrueba.add(aux.getCaracter(i).getLexema());
+                    i++;
+                }
+                i=0;
+                
+                while(operador>0){
+                    TokenCaracterCambio actual=(TokenCaracterCambio)Expresion.get(i);
+                    
+                    if(actual.getOperador()&&actual.cambio==false){
+                        System.out.println("Lexema: "+actual.getLexema()+"   "+actual.cambio);
+                        int Espacios=0,i2=i;
+                        
+                        while (actual.getOperador()) {
+                            if(actual.cambio==false){
+                                Espacios++;    
+                            }
+                            i++;
+                            actual = (TokenCaracterCambio) Expresion.get(i);
+                        }
+                        System.out.println("Espacios: "+Espacios);
+                        i = i2;
+                        if(i>=Expresion.size()){
+                            i--;
+                        }
+                        System.out.println(i);
+                        actual = (TokenCaracterCambio) Expresion.get(i);
+                        if ((actual.getLexema().equals("*") || actual.getLexema().equals("?") || actual.getLexema().equals("+"))&&Espacios>1) {
+                            Espacios++;
+                        }
+                        if(i+2<Expresion.size()){
+                            TokenCaracterCambio sig=(TokenCaracterCambio)Expresion.get(i+2);
+                        if(sig.Caracter.equals("|")&&sig.cambio==false){
+                            Espacios++;
+                        }
+                        }
+                        if(i+1<Expresion.size()){
+                        TokenCaracterCambio sig=(TokenCaracterCambio)Expresion.get(i+1);
+                        
+                        if((sig.Caracter.getLexema().equals("*")||sig.Caracter.getLexema().equals("?")||sig.Caracter.getLexema().equals("+"))&&sig.cambio==false){
+                                Espacios--;
+                        }
+                        
+                        }
+                        
+                        System.out.println("Espacios: "+Espacios);
+                        actual.cambio=true;
+                        TokenCaracterCambio mover = actual;
+                        System.out.println("Valor i : "+i);
+                        Expresion.remove(i);
+                        if(!mover.getLexema().equals("|")){
+                            Expresion.add(i,new TokenCaracterCambio(new Token("ParentesisA","(",false),false));
+                        }
+                        
+                        while (Espacios > 0) {
+                            
+                            if (actual.getTipo().equals("id") || actual.getTipo().equals("Cadena")) {
+                                Espacios--;
+                            }
+                            System.out.println("Espacios en While: "+Espacios);
+                            i++;
+                            System.out.println("I: "+i+"     Expresion:"+Expresion.size());
+                            if(i<Expresion.size()){
+                                actual = (TokenCaracterCambio) Expresion.get(i);
+                            }else{
+                                break;
+                            }
+                            
+                            
+                        }
+                        System.out.println("Espacios: "+Espacios);
+                        System.out.println("Sali While");
+                        System.out.println("Valor i : "+i);
+                        if (mover.getLexema().equals("*") || mover.getLexema().equals("?") || mover.getLexema().equals("+")) {
+                            
+                            mover.cambio=true;
+                            System.out.println(mover.cambio);
+                            if(i+1>=Expresion.size()){
+                                Expresion.add(i, mover);
+                                Expresion.add(i,new TokenCaracterCambio(new Token("ParentesisC",")",false),false));
+                            }else{
+                                Expresion.add(i, mover);
+                                Expresion.add(i,new TokenCaracterCambio(new Token("ParentesisC",")",false),false));
+                            }
+                                
+                            
+                            
+                            operador--;
+                            System.out.println("operador: "+operador);
+                        } else {
+                            
+                            if(mover.getLexema().equals("|")){
+                                
+                                mover.cambio=true;
+                                System.out.println(mover.cambio);
+                                Expresion.add(i, mover);
+                            }else{
+                                mover.cambio=true;
+                                System.out.println(mover.cambio);
+                                Expresion.add(i, mover);
+                                Expresion.add(i,new TokenCaracterCambio(new Token("ParentesisC",")",false),false));
+                                
+                            }
+                            
+                            operador--;
+                            System.out.println("operador: "+operador);
+                         
+                        }
+                        i = 0;
+                        System.out.println("");
+                        System.out.println("\n");
+                        for (int z = 0; z < Expresion.size(); z++) {
+                            TokenCaracterCambio Ver = (TokenCaracterCambio) Expresion.get(z);
+                            System.out.println(Ver.Caracter.getLexema()+"   "+Ver.cambio);
+                        }
+                        for (int z = 0; z < Expresion.size(); z++) {
+                            TokenCaracterCambio Ver = (TokenCaracterCambio) Expresion.get(z);
+                            System.out.print(Ver.Caracter.getLexema());
+                        }
+                        System.out.println("\n");
+
+                           
+                    }else{
+                        i++;
+                    }
+                    
+                    
+                    
+                }
+                
+                
+                i=0;
+                while(aux.getSize()>i){
+                    ExpresionPolaca.add(0,aux.getCaracter(i));
+                    i++;
+                }
+                
+            }
+            
+            c++;
+            
+            
+            if(Expresion.size()>0){
+                
+                Expresiones exp=new Expresiones(Nombre,Expresion);
+                ExpNormales.add(exp);
+                exp=new Expresiones(Nombre,ExpresionPolaca);
+                ExpPolacas.add(exp);
+                Expresion=new ArrayList(); 
+            }
+            
         }
-        System.out.println("PRUEBAS");
-        for(int i=0;i<sintactico.PRUEBAS.size();i++){
-            System.out.println(sintactico.PRUEBAS.get(i).getLexema());
+        
+        for(int j=0;j<ExpNormales.size();j++){
+            //Expresiones Exp=;
+            System.out.println(ExpNormales.get(j).getNombre());
+            for (int k=0;k<ExpNormales.get(j).getLista().size();k++){
+                System.out.println("\t"+ExpNormales.get(j).getLista().get(k));
+            }
+            System.out.println(ExpPolacas.get(j).getNombre());
+            for (int k=0;k<ExpPolacas.get(j).getLista().size();k++){
+                System.out.println("\t"+ExpPolacas.get(j).getLista().get(k).getLexema());
+            }
         }
+        
+        System.out.println("Termine");
     }
+    
+    
 
     public void ReporteErrores() {
         FileWriter Reporte = null;
         PrintWriter pw = null;
         try {
-            Reporte = new FileWriter("REPORTE DE ERRORES.html");
+            Reporte = new FileWriter("C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\ERRORES_202004734\\REPORTE DE ERRORES.html");
             pw = new PrintWriter(Reporte);
             pw.println("<html>");
             pw.println("<head>");

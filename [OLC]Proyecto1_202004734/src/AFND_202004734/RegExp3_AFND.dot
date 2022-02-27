@@ -1,0 +1,16 @@
+digraph G {
+label = "AFND RegExp3"
+S0 [label = "S0"]
+S1 [label = "S1"]
+rank=same{S0-> S1[label="digito"]}
+S2 [label = "S2"]
+rank=same{S1-> S2[label="ε"]}
+S3 [label = "S3"]
+rank=same{S2-> S3[label=""_""]}
+S4 [label = "S4"]
+rank=same{S3-> S4[label="letra"]}
+S5 [label = "S5"]
+rank=same{S4-> S5[label="ε"]}
+rank=same{S4-> S2[label="ε"]}
+S1-> S5[label="ε"]
+S6[color=blue]}
