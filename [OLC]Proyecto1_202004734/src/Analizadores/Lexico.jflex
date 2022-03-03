@@ -7,7 +7,6 @@ import java.util.LinkedList;
 
 %{
     public static LinkedList<TError> errores = new LinkedList<TError>(); 
-    public static LinkedList<Tokens> Tokens = new LinkedList<TError>(); 
 %}
 
 %public
@@ -23,7 +22,7 @@ import java.util.LinkedList;
 
 letra=[a-zA-Z]
 numero=[0-9]+
-id={letra}+{numero}*
+id={letra}({letra}|"_"|{numero})*
 cadena = ([\"][^\n\"]* [\"]) | ([\'][^\n\']* [\'])
 comentario ="//"[^\n]*
 comentarioMulti = "<!"[^"!>"]* "!>"

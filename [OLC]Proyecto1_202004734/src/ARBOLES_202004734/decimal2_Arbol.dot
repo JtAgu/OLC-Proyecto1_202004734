@@ -1,0 +1,21 @@
+digraph G {
+node [shape="Mrecord"]label = "ARBOL decimal2"
+SPunto0[label="|{|.}|"]
+Sid0[label="[ 1  ]|{false|digito|1}|[ 1  ]"]
+SPunto1[label="|{|.}|"]
+SCadena0[label="[ 2  ]|{false|\".\"|2}|[ 2  ]"]
+SMas0[label="|{|+}|"]
+Sid1[label="[ 3  ]|{false|digito|3}|[ 3  ]"]
+SMas0->Sid1
+SMas0[label="[ 3  ]|{false|+}|[ 3  ]"]
+SPunto1->SMas0
+SPunto1->SCadena0
+SPunto1[label="[ 2  ]|{false|.}|[ 3  ]"]
+SPunto0->SPunto1
+SPunto0->Sid0
+SPunto0[label="[ 1  ]|{false|.}|[ 3  ]"]
+EOF[label="[4]|{false|$|4}|[4]"];
+SPuntoFinal[label="[ 1  ]|{false|.}|[ 4  ]"];
+SPuntoFinal->EOF
+SPuntoFinal->SPunto0
+}

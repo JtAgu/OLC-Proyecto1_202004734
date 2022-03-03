@@ -1,0 +1,21 @@
+digraph G {
+node [shape="Mrecord"]label = "ARBOL expre2"
+SPunto0[label="|{|.}|"]
+SCadena0[label="[ 1  ]|{false|\"a\"|1}|[ 1  ]"]
+SPunto1[label="|{|.}|"]
+SCadena1[label="[ 2  ]|{false|\"a\"|2}|[ 2  ]"]
+SMas0[label="|{|+}|"]
+Sid0[label="[ 3  ]|{false|grupo_1|3}|[ 3  ]"]
+SMas0->Sid0
+SMas0[label="[ 3  ]|{false|+}|[ 3  ]"]
+SPunto1->SMas0
+SPunto1->SCadena1
+SPunto1[label="[ 2  ]|{false|.}|[ 3  ]"]
+SPunto0->SPunto1
+SPunto0->SCadena0
+SPunto0[label="[ 1  ]|{false|.}|[ 3  ]"]
+EOF[label="[4]|{false|$|4}|[4]"];
+SPuntoFinal[label="[ 1  ]|{false|.}|[ 4  ]"];
+SPuntoFinal->EOF
+SPuntoFinal->SPunto0
+}

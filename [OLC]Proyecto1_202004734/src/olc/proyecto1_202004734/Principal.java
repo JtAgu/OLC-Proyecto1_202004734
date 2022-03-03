@@ -33,8 +33,8 @@ public class Principal {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        /*Pattern pattern = Pattern.compile("[0-9].[0-9]+");
-        Matcher matcher = pattern.matcher("34.44");
+        /*Pattern pattern = Pattern.compile("[7~8].[7~8]+");
+        Matcher matcher = pattern.matcher("7.88");
         boolean matchFound = matcher.matches();
         if(matchFound) {
           System.out.println("Match found");

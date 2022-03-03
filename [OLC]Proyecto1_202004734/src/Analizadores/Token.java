@@ -17,13 +17,13 @@ public class Token {
     int size;
     boolean operador;
     
+    
 
     public Token(String tipo, String lexema,boolean operador) {
         this.tipo = tipo;
         this.lexema = lexema;
         this.operador=operador;
-        this.size=0;
-        
+        this.size=0;     
     }
     
     
@@ -46,6 +46,10 @@ public class Token {
         return lexema;
     }
     
+    public void setLexema(String lex) {
+        lexema=lex;
+    }
+    
     public String getTipo() {
         return tipo;
     }
@@ -56,6 +60,10 @@ public class Token {
     
     public boolean getOperador() {
         return operador;
+    }
+    
+    public void setOperador(boolean op) {
+        operador=op;
     }
     
     public int getSize() {
