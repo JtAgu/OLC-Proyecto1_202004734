@@ -6,7 +6,12 @@
 package olc.proyecto1_202004734;
 
 import Analizadores.Token;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,6 +24,7 @@ public class Expresiones {
     String nombre;
     ArrayList <Nodos> Nodos;
     ArrayList <String> siguientes=new ArrayList<String>();
+    ArrayList <Estados> ListaEstados=new ArrayList<Estados>();
 
     public Expresiones(String nombre, ArrayList<Token> Lista) {
         this.nombre = nombre;
@@ -468,6 +474,8 @@ public class Expresiones {
             nuevo.Primeros.add(Hoja);
         }
         
+        
+        
         ListaNodos2.add(nuevo);
         
         for (int a = 0; a < tk.Ultimos.size(); a++) {
@@ -495,7 +503,17 @@ public class Expresiones {
 
         contenido += "SPuntoFinal[label=\""+prim+"|{false|.}|"+ult+"\"];\n";
         
-        
+        Estados nuevoEstado=new Estados("S0",prim);
+        for(int a=0;a<nuevo.Primeros.size();a++){
+            for(int b=0;b<ListaNodos2.size();b++){
+                Nodos aux=ListaNodos2.get(b);
+                if(aux.Hoja==(int)nuevo.Primeros.get(a)){
+                    nuevoEstado.hojas.add(aux);
+                    break;
+                }
+            }
+        }
+        ListaEstados.add(nuevoEstado);
         
         contenido += "SPuntoFinal->EOF\n"
                 + "SPuntoFinal->" + ultimo + "\n";
@@ -547,9 +565,146 @@ public class Expresiones {
             }
         }
         contenido2+="</TABLE>>];\n}";
-        System.out.println(contenido2);
+        Dot(contenido2,"\\SIGUIENTES_202004734\\"+this.nombre+"_TABLA_SIGUIENTES");
+        Transiciones();
         
     }
+    
+    public void Transiciones(){
+        ArrayList <String> Terminales=new ArrayList<String>();
+        String afd= "digraph G {\n";
+        afd += "label = \"AFD DE " + this.nombre + "\"\n";
+        
+        
+        String contenido = "digraph G {\n";
+        contenido += "label = \"TABLA TRANSICIONES PARA " + this.nombre + "\"\n";
+        contenido += "a0 [label=<\n <TABLE cellspacing=\"0\" cellpadding=\"10\">\n"
+                + "<TR>\n"
+                + "<TD>ESTADO</TD>\n";
+        int estado=0;
+        for(int a=0;a<Nodos.size();a++){
+            if(!Nodos.get(a).operador){
+                Nodos aux=Nodos.get(a);
+                boolean Visto=false;
+                for (int b=0;b<Terminales.size();b++){
+                    if((""+aux.getLexema()).equals(""+Terminales.get(b))){
+                        Visto=true;
+                        break;
+                    }
+                }
+                if(!Visto){
+                    Terminales.add(aux.getLexema());
+                }
+            }
+        }
+        Terminales.remove((Terminales.size()-1));
+        for(int a=0;a<Terminales.size();a++){
+            contenido+= "<TD>"+Terminales.get(a)+"</TD>\n";
+        }     
+        contenido+= "</TR>\n";
+        
+        for(int a=0;a<ListaEstados.size();a++){
+            
+            ArrayList <Estados> EstadosAux=new ArrayList<Estados>();
+            Estados aux=ListaEstados.get(a);
+            contenido+="<TR><TD>"+aux.estado+"</TD>";
+            
+            for (int b = 0; b < aux.hojas.size(); b++) {
+                String ult = "[ ";
+                Nodos hoja = aux.hojas.get(b);
+                
+                for (int c = 0; c < hoja.Siguientes.size(); c++) {
+                    ult += hoja.Siguientes.get(c) + " ,";
+                }
+                ult = ult.substring(0, ult.length() - 1);
+                ult += "]";
+                boolean encontrado = false;
+                System.out.println("\nHoja: "+hoja.Hoja+"\n");
+                for (int c = 0; c < ListaEstados.size(); c++) {
+                    System.out.println(ult+"             "+ListaEstados.get(c).id);
+                    if ((""+ListaEstados.get(c).id).equals(ult)) {
+                        encontrado = true;
+                        System.out.println("Encontre");
+                    }
+                }
+                System.out.println("Sali For");
+                if(encontrado){
+                    
+                    Estados nuevo=new Estados("S"+estado,ult,hoja.Hoja);
+                    EstadosAux.add(nuevo);
+                    Nodos flecha=null;
+                    afd+=ListaEstados.get(a).estado+" -> "+nuevo.estado  +"[label=\""+hoja.lexema+"\"]\n";
+                    
+                }else{
+                    
+                    estado++;
+                    Estados nuevo=new Estados("S"+estado,ult,hoja.Hoja);
+                    EstadosAux.add(nuevo);
+                    for(int c=0;c<hoja.Siguientes.size();c++){
+                        for(int d=0;d<Nodos.size();d++){
+                            if((int)hoja.Siguientes.get(c)==Nodos.get(d).Hoja){
+                                nuevo.hojas.add(Nodos.get(d));
+                            }
+                        }
+                    }
+                    if(!hoja.lexema.equals("$")){
+                        afd+=ListaEstados.get(a).estado+" -> "+nuevo.estado +"[label=\""+hoja.lexema+"\"]\n";
+                        ListaEstados.add(nuevo);
+                    }
+                }
+                
+            }           
+                for(int b=0;b<Terminales.size();b++){
+                    boolean encontrado=false;
+                    Estados EstadoActual=null;
+                    for(int c=0;c<EstadosAux.size();c++){
+                        Nodos auxNodo=null;
+                        for(int d=0;d<Nodos.size();d++){
+                            auxNodo=Nodos.get(d);
+                            if(auxNodo.Hoja==EstadosAux.get(c).hoja){
+                                break;
+                            }
+                        }
+                        if(Terminales.get(b).equals(auxNodo.lexema)){
+                            encontrado=true;
+                            EstadoActual=EstadosAux.get(c);
+                            break;
+                        }
+                    }
+                    if(encontrado){
+                        contenido+="<TD>"+EstadoActual.estado+"</TD>";
+                    }else{
+                        contenido+="<TD> </TD>";
+                    }
+                }
+            
+            contenido+="</TR>";
+        }
+        
+        contenido+="</TABLE>>];\n}";
+        afd+="}";
+        System.out.println(contenido);
+        System.out.println("\n\n");
+        Dot(contenido,"\\TRANSICIONES_202004734\\"+this.nombre+"_TABLA_TRANSICIONES");
+        
+        Dot(afd,"\\AFD_202004734\\"+this.nombre+"_AFD");
+        
+    }
+    
+    public void Dot(String contenido, String Clave) {
+        ProcessBuilder pbuilder;
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter("C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\" + Clave + ".dot"));
+            bw.write(contenido);
+            bw.close();
+            pbuilder = new ProcessBuilder("dot", "-Tpng", "-o", "C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\" + Clave + ".png", "C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\" + Clave + ".dot");
+            pbuilder.redirectErrorStream(true);
+            pbuilder.start();
+        } catch (IOException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
 
     public String getNombre() {
         return nombre;

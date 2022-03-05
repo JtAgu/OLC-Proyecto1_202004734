@@ -18,8 +18,10 @@ import Analizadores.Analizador_Lexico;
 import Analizadores.Analizador_Sintactico;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,6 +34,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -63,10 +66,14 @@ public class Interfaz extends JFrame implements ActionListener {
     JButton bAbrir, bGuardar, bGuardarComo, bJSON, GenAutomata, bAnalizar, bVisualizar, bBack, bNext;
     JTree TArchivos;
     DefaultMutableTreeNode treee, transition, next, Automatas;
+    DefaultMutableTreeNode Archivo = new DefaultMutableTreeNode("Archivo");
     JTextArea ta, TaSalida;
     JLabel l1, l2, l3;
     JComboBox Imagenes;
     File archivo = null;
+    
+    
+    int cArbol=0,cSig=0,cTrans=0,cAuto=0;
 
     public Interfaz() {
 
@@ -120,7 +127,7 @@ public class Interfaz extends JFrame implements ActionListener {
         this.add(bAnalizar);
 
         bVisualizar = new JButton("VISUALIZAR");
-        bVisualizar.setBounds(800, 10, 140, 35);
+        bVisualizar.setBounds(850, 10, 140, 35);
         bVisualizar.setBackground(new Color(171, 235, 198));
         bVisualizar.setVisible(true);
         bVisualizar.addActionListener(this);
@@ -128,7 +135,7 @@ public class Interfaz extends JFrame implements ActionListener {
         this.add(bVisualizar);
 
         bBack = new JButton("ANTERIOR");
-        bBack.setBounds(650, 365, 140, 35);
+        bBack.setBounds(700, 395, 140, 35);
         bBack.setBackground(new Color(171, 235, 198));
         bBack.setVisible(true);
         bBack.addActionListener(this);
@@ -136,7 +143,7 @@ public class Interfaz extends JFrame implements ActionListener {
         this.add(bBack);
 
         bNext = new JButton("SIGUIENTE");
-        bNext.setBounds(800, 365, 140, 35);
+        bNext.setBounds(870, 395, 140, 35);
         bNext.setBackground(new Color(171, 235, 198));
         bNext.setVisible(true);
         bNext.addActionListener(this);
@@ -144,7 +151,7 @@ public class Interfaz extends JFrame implements ActionListener {
         this.add(bNext);
 
         //PROGRAMANDO TREE DE INTERFAZ
-        DefaultMutableTreeNode Archivo = new DefaultMutableTreeNode("Archivo");
+        
         treee = new DefaultMutableTreeNode("ARBOLES");
         next = new DefaultMutableTreeNode("SIGUIENTES");
         transition = new DefaultMutableTreeNode("TRANSICIONES");
@@ -157,7 +164,7 @@ public class Interfaz extends JFrame implements ActionListener {
 
         TArchivos = new JTree(Archivo);
         JScrollPane sp = new JScrollPane(TArchivos);
-        sp.setBounds(460, 10, 175, 400);
+        sp.setBounds(480, 10, 175, 400);
         this.add(sp);
 
         //PROGRAMANDO LABEL DE INTERFAZ
@@ -168,20 +175,20 @@ public class Interfaz extends JFrame implements ActionListener {
         this.add(l1);
 
         l2 = new JLabel("ARCHIVO DE SALIDA");
-        l2.setBounds(10, 410, 160, 30);
+        l2.setBounds(30, 410, 160, 30);
         l2.setVisible(true);
         l2.setFont(new Font("arial", Font.BOLD, 12));
         this.add(l2);
 
-        l3 = new JLabel("HOLA");
-        l3.setBounds(650, 50, 290, 290);
+        l3 = new JLabel("");
+        l3.setBounds(680, 50, 350, 335);
         l3.setVisible(true);
         l3.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         this.add(l3);
 
         String[] list = {"Arboles", "Siguientes", "Transiciones", "Automatas"};
         Imagenes = new JComboBox(list);
-        Imagenes.setBounds(650, 10, 140, 35);
+        Imagenes.setBounds(690, 10, 140, 35);
         Imagenes.setFont(new Font("arial", Font.BOLD, 12));
         Imagenes.setBackground(new Color(171, 235, 198));
         this.add(Imagenes);
@@ -198,12 +205,18 @@ public class Interfaz extends JFrame implements ActionListener {
 
         TaSalida = new JTextArea();
         JScrollPane sp2 = new JScrollPane(TaSalida);
-        TaSalida.setBounds(10, 440, 930, 170);
+        TaSalida.setBounds(65, 440, 930, 200);
         TaSalida.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
         this.add(TaSalida);
 
+        bNext.setEnabled(false);        
+        bBack.setEnabled(false);
+        bVisualizar.setEnabled(false);
+        GenAutomata.setEnabled(false);
+        bAnalizar.setEnabled(false);
+        
         this.setTitle("Log In DTT");
-        this.setBounds(150, 80, 960, 650);
+        this.setBounds(125, 10, 1080, 700);
         this.setLayout(null);
         this.setVisible(true);
         this.setResizable(false);
@@ -215,18 +228,20 @@ public class Interfaz extends JFrame implements ActionListener {
 
             if (contenido == "") {
                 leerArchivos();
+                
             } else {
                 JOptionPane.showMessageDialog(this, "YA HAY UN ARCHIVO EXISTENTE", "ADVERTENCIA", WARNING_MESSAGE);
             }
-
+            
         } else if (e.getSource() == bAnalizar) {
-
+            
             if (contenido != "") {
                 Analizar();
+                
             } else {
                 JOptionPane.showMessageDialog(this, "INGRESE ARCHIVO EXP", "ADVERTENCIA", WARNING_MESSAGE);
             }
-
+            
         } else if (e.getSource() == bGuardar) {
             Guardar();
         } else if (e.getSource() == bJSON) {
@@ -236,18 +251,122 @@ public class Interfaz extends JFrame implements ActionListener {
         } else if (e.getSource() == GenAutomata) {
             //GenerarAutomatasAFND();
             GenerarArbol();
+            Transformar();
+            bNext.setEnabled(true);        
+            bBack.setEnabled(true);
+            bVisualizar.setEnabled(true);
         } else if (e.getSource() == bBack) {
-            
+            AnteriorImagen();
         } else if (e.getSource() == bNext) {
-
+            SiguienteImagen();
         } else if (e.getSource() == bVisualizar) {
-
+            VerImagen();
         }
-
+    }
+    
+    
+    public void VerImagen(){
+        cAuto=0;cTrans=0;cArbol=0;cSig=0;
+        String tipo=Imagenes.getSelectedItem().toString(),ruta="";
+        
+        if(tipo.equals("Arboles")){
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\ARBOLES_202004734\\"+arboles.get(0)+"_Arbol.png";
+        }else if(tipo.equals("Automatas")){
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFD_202004734\\"+automata.get(0)+"_AFD.png";            
+        }else if(tipo.equals("Siguientes")){
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\SIGUIENTES_202004734\\"+siguientes.get(0)+"_TABLA_SIGUIENTES.png";
+        }else if(tipo.equals("Transiciones")){
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\TRANSICIONES_202004734\\"+transicion.get(0)+"_TABLA_TRANSICIONES.png";
+        }
+        
+            ImageIcon img=new ImageIcon(ruta);
+            Icon icono=new ImageIcon(img.getImage().getScaledInstance(l3.getWidth(), l3.getHeight(), Image.SCALE_DEFAULT));
+            l3.setIcon(icono);
+        
+    }
+    
+    public void SiguienteImagen(){
+        String tipo=Imagenes.getSelectedItem().toString(),ruta="";
+        
+        if(tipo.equals("Arboles")){
+            if((cArbol+1)<arboles.size()){
+                cArbol++;
+            }else{
+                cArbol=0;
+            }
+            
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\ARBOLES_202004734\\"+arboles.get(cArbol)+"_Arbol.png";
+        }else if(tipo.equals("Automatas")){
+            if((cAuto+1)<automata.size()){
+                cAuto++;
+            }else{
+                cAuto=0;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFD_202004734\\"+automata.get(cAuto)+"_AFD.png";            
+        }else if(tipo.equals("Siguientes")){
+            if((cSig+1)<siguientes.size()){
+                cSig++;
+            }else{
+                cSig=0;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\SIGUIENTES_202004734\\"+siguientes.get(cSig)+"_TABLA_SIGUIENTES.png";
+        }else if(tipo.equals("Transiciones")){
+            if((cTrans+1)<transicion.size()){
+                cTrans++;
+            }else{
+                cTrans=0;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\TRANSICIONES_202004734\\"+transicion.get(cTrans)+"_TABLA_TRANSICIONES.png";
+        }
+        
+            ImageIcon img=new ImageIcon(ruta);
+            Icon icono=new ImageIcon(img.getImage().getScaledInstance(l3.getWidth(), l3.getHeight(), Image.SCALE_DEFAULT));
+            l3.setIcon(icono);
+    }
+    
+    public void AnteriorImagen(){
+        String tipo=Imagenes.getSelectedItem().toString(),ruta="";
+        
+        if(tipo.equals("Arboles")){
+            if((cArbol-1)<0){
+                cArbol--;
+            }else{
+                cArbol=arboles.size()-1;
+            }
+            
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\ARBOLES_202004734\\"+arboles.get(cArbol)+"_Arbol.png";
+        }else if(tipo.equals("Automatas")){
+            if((cAuto-1)<0){
+                cAuto--;
+            }else{
+                cAuto=automata.size()-1;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\AFD_202004734\\"+automata.get(cAuto)+"_AFD.png";            
+        }else if(tipo.equals("Siguientes")){
+            if((cSig-1)<0){
+                cSig--;
+            }else{
+                cSig=siguientes.size()-1;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\SIGUIENTES_202004734\\"+siguientes.get(cSig)+"_TABLA_SIGUIENTES.png";
+        }else if(tipo.equals("Transiciones")){
+            if((cTrans-1)<0){
+                cTrans--;
+            }else{
+                cTrans=transicion.size()-1;
+            }
+            ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\src\\TRANSICIONES_202004734\\"+transicion.get(cTrans)+"_TABLA_TRANSICIONES.png";
+        }
+        
+            ImageIcon img=new ImageIcon(ruta);
+            Icon icono=new ImageIcon(img.getImage().getScaledInstance(l3.getWidth(), l3.getHeight(), Image.SCALE_DEFAULT));
+            l3.setIcon(icono);
     }
     
     public void JSON(){
-        
+        for(int a=0;a<ExpNormales.size();a++){
+            System.out.println(ExpNormales.get(a).Regex);
+        }
     }
     
     public void GenerarArbol(){
@@ -255,6 +374,30 @@ public class Interfaz extends JFrame implements ActionListener {
             Dot(ExpPolacas.get(x).DotAFN(),"ARBOLES_202004734\\"+ExpPolacas.get(x).nombre+"_Arbol");
             DefaultMutableTreeNode arbol = new DefaultMutableTreeNode(ExpPolacas.get(x).nombre);
             treee.add(arbol);
+            DefaultMutableTreeNode trans = new DefaultMutableTreeNode(ExpPolacas.get(x).nombre);
+            transition.add(trans);
+            DefaultMutableTreeNode sig = new DefaultMutableTreeNode(ExpPolacas.get(x).nombre);
+            next.add(sig);
+            DefaultMutableTreeNode afd = new DefaultMutableTreeNode(ExpPolacas.get(x).nombre+"_AFD");
+            Automatas.add(afd);
+            
+            arboles.add(ExpPolacas.get(x).nombre);
+            siguientes.add(ExpPolacas.get(x).nombre);
+            transicion.add(ExpPolacas.get(x).nombre);
+            automata.add(ExpPolacas.get(x).nombre);
+            
+            Archivo.remove(3);
+            Archivo.remove(2);
+            Archivo.remove(1);
+            Archivo.remove(0);
+            
+            Archivo.add(treee);
+            Archivo.add(transition);
+            Archivo.add(next);
+            Archivo.add(Automatas);
+            
+            
+                    
         }
     }
     
@@ -328,6 +471,7 @@ public class Interfaz extends JFrame implements ActionListener {
                 ReporteErrores();
                 Errores = true;
             } else {
+                
                 Errores = false;
                 ErroresLex = lexico.errores;
                 ErroresSintact = sintactico.errores;
@@ -335,10 +479,9 @@ public class Interfaz extends JFrame implements ActionListener {
                 EXPRESIONES = sintactico.EXPRESIONES;
                 PRUEBAS = sintactico.PRUEBAS;
                 GuardarPolaca();
-                Transformar();
-                NombreArchivo = archivo.getName();
-                JOptionPane.showMessageDialog(this, "ANALISIS COMPLETADO", "SIN ERRORES ENCONTRADOS", WARNING_MESSAGE);
                 
+                JOptionPane.showMessageDialog(this, "ANALISIS COMPLETADO", "SIN ERRORES ENCONTRADOS", WARNING_MESSAGE);
+                GenAutomata.setEnabled(true);
             }
         } catch (Exception e) {
         }
@@ -367,25 +510,17 @@ public class Interfaz extends JFrame implements ActionListener {
                 ExpPolacas.add(nuevoPol);
 
             }
+            System.out.println(c);
             c++;
         }
         
-        for(int x=0;x<ExpPolacas.size();x++){
-            for(int y=0;x<ExpPolacas.get(x).Caracteres.size();y++){
-                System.out.println(ExpPolacas.get(x).Caracteres.get(y).getLexema());
-            }
-            System.out.println("\n");
-        }
+        
     }
     
     public void Transformar() {
         int i = 0, estado = 0, NumOperadores = 0, cMovidos = 0, c = 0;
         ArrayList<TokenCaracterCambio> Expresion = new ArrayList<TokenCaracterCambio>();
         String Nombre="";
-        
-        
-        
-
         
         while (c < EXPRESIONES.size()) {
 
@@ -524,6 +659,8 @@ public class Interfaz extends JFrame implements ActionListener {
             for (int a = 0; a < Expresion.size(); a++) {
                 System.out.print(Expresion.get(a).Caracter.getLexema());
             }
+            Expresiones normal=new Expresiones(Nombre,Expresion.get(0).Caracter.getLexema());
+            ExpNormales.add(normal);
             System.out.println("");
             Expresion.clear();
             c++;
@@ -621,6 +758,7 @@ public class Interfaz extends JFrame implements ActionListener {
                 }
                 String contenido2 = contenido.replace("\t", "\n\t");
                 ta.setText(contenido2);
+                bAnalizar.setEnabled(true);
 
             } else {
                 JOptionPane.showMessageDialog(this, "DEBE SELECCIONAR UN ARCHIVO", "ADVERTENCIA", WARNING_MESSAGE);

@@ -1,0 +1,7 @@
+digraph G {
+label = "AFD DE expre2"
+S0 -> S1[label="\"a\""]
+S1 -> S2[label="\"a\""]
+S2 -> S3[label="grupo_1"]
+S3 -> S3[label="grupo_1"]
+}
