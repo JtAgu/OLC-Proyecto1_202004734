@@ -22,9 +22,11 @@ import java.util.LinkedList;
 
 letra=[a-zA-Z]
 numero=[0-9]+
+especial=  [\"][\\][\",n,t,\'][\"]
 id={letra}({letra}|"_"|{numero})*
 cadena = ([\"][^\n\"]* [\"]) | ([\'][^\n\']* [\'])
 comentario ="//"[^\n]*
+
 comentarioMulti = "<!"[^"!>"]* "!>"
 
 %%
@@ -208,6 +210,10 @@ comentarioMulti = "<!"[^"!>"]* "!>"
 <YYINITIAL>{id} {
                     System.out.println("Reconocio token: <id> lexema: "+ yytext());
                     return new Symbol(Simbolos.id, yycolumn, yyline, yytext());
+                }
+<YYINITIAL>{especial} {
+                    System.out.println("Reconocio token: <especial> lexema: "+ yytext());
+                    return new Symbol(Simbolos.Cadena, yycolumn, yyline, yytext());
                 }
 
 <YYINITIAL>{cadena} {

@@ -162,7 +162,28 @@ INS_CONJ::= CONJ DosPuntos id:a flecha CONJUNTOS PuntoComa:b
     {:
         Token tmp = new Token("id",a.toString(),false);
         CONJUNTOS.add(tmp);
-        tmp = new Token("VALORES",tipo+","+Conjunto,false);
+        
+        if(tipo.equals("Rango")){
+            String [] al=Conjunto.split("~");
+            String []aux=Conjunto.split("-");
+            String as="[",as2="[";
+            
+            if(al.length>0){
+                as+=al[1]+"-"+al[0]+"]";
+                Conjunto=as;
+            }else{
+                as2+=aux[1]+"-"+aux[0]+"]";
+                Conjunto=as2;
+            }
+            
+        }else{
+            String c="["+Conjunto+"]";
+            Conjunto=c;
+        }
+        
+        
+        
+        tmp = new Token(a.toString(),Conjunto,false);
         CONJUNTOS.add(tmp);
         Conjunto="";
         tipo="Lista";
@@ -199,19 +220,6 @@ VAL_RANGO::=    numero:a{:
                 | guion:a VAL_RANGO {:
         Conjunto+=a.toString();
         tipo="Rango";
-    :}
-                |InterrogacionC:a VAL_RANGO {:
-        Conjunto+=a.toString();
-    :}
-                |InterrogacionC:a {:
-        Conjunto+=a.toString();
-    :}
-                |Asterisco:a VAL_RANGO {:
-        Conjunto+=a.toString();
-    :}
-                |Asterisco:a {:
-        Conjunto+=a.toString();
-        
     :}
                 |Punto:a VAL_RANGO {:
         Conjunto+=a.toString();
@@ -257,10 +265,10 @@ VAL_RANGO::=    numero:a{:
                 |LlaveC :a {:
         Conjunto+=a.toString();
     :}
-                |Or:a VAL_RANGO {:
+                |Cadena:a VAL_RANGO {:
         Conjunto+=a.toString();
     :}
-                |Or:a {:
+                |Cadena:a {:
         Conjunto+=a.toString();
     :}
                 |DosPuntos:a VAL_RANGO {:

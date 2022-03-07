@@ -1,0 +1,67 @@
+non terminal INICIO,  INSTRUCCION, INS_CONJ,  INS_EXP, INS_SEPARACION,INS_CREACION, CONJUNTOS, VAL_RANGO, LISTA_CREACION;
+
+start with INICIO;
+
+INICIO::= LlaveA INSTRUCCION
+;
+
+
+INSTRUCCION::= INS_CONJ INSTRUCCION
+            |INS_EXP INSTRUCCION
+            |INS_SEPARACION INSTRUCCION
+            |INS_CREACION INSTRUCCION
+            |LlaveC
+;
+
+INS_CREACION::= id flecha LISTA_CREACION PuntoComa 
+;
+
+LISTA_CREACION::=LlaveA id LlaveC LISTA_CREACION                 
+                |LlaveA id LlaveC 
+                |Cadena LISTA_CREACION 
+                |Cadena 
+                |Punto LISTA_CREACION 
+                |Mas LISTA_CREACION 
+                |Or LISTA_CREACION 
+                |InterrogacionC LISTA_CREACION 
+                |Asterisco LISTA_CREACION 
+;
+
+INS_SEPARACION::= PorCiento PorCiento
+;
+
+
+INS_CONJ::= CONJ DosPuntos id flecha CONJUNTOS PuntoComa   
+;
+
+CONJUNTOS::= VAL_RANGO
+;
+
+VAL_RANGO::=    numero
+                | numero VAL_RANGO   
+                | id
+                | id VAL_RANGO
+                | ASSCI
+                | ASSCI VAL_RANGO 
+                | coma VAL_RANGO 
+                | guion VAL_RANGO 
+                |Punto VAL_RANGO 
+                |Punto 
+                |MenorQue VAL_RANGO 
+                |MenorQue 
+                |MayorQue VAL_RANGO 
+                |MayorQue
+                |PorCiento VAL_RANGO 
+                |PorCiento
+                |LlaveA VAL_RANGO 
+                |LlaveA
+                |LlaveC VAL_RANGO 
+                |LlaveC
+                |Cadena VAL_RANGO
+                |Cadena
+                |DosPuntos VAL_RANGO 
+                |DosPuntos 
+;
+
+INS_EXP::= id DosPuntos Cadena PuntoComa 
+;

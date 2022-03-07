@@ -12,31 +12,33 @@ import Analizadores.Token;
  * @author justin
  */
 public class TokenCaracterCambio {
+
     Token Caracter;
     boolean cambio;
     int Elem;
-    public TokenCaracterCambio(Token Caracter,boolean cambio,int i){
-        this.Caracter=Caracter;
-        this.cambio=cambio;
-        this.Elem=i;
+
+    public TokenCaracterCambio(Token Caracter, boolean cambio, int i) {
+        this.Caracter = Caracter;
+        this.cambio = cambio;
+        this.Elem = i;
     }
-    
-    public void SetElem(int e){
-        this.Elem=e;
+
+    public void SetElem(int e) {
+        this.Elem = e;
     }
-    
+
     public String getLexema() {
         return Caracter.getLexema();
     }
-    
+
     public void SetLexema(String lexema) {
-       Caracter.setLexema(lexema);
+        Caracter.setLexema(lexema);
     }
-    
+
     public boolean getOperador() {
         return Caracter.getOperador();
     }
-    
+
     public String getTipo() {
         return Caracter.getTipo();
     }

@@ -33,18 +33,10 @@ public class Principal {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        /*Pattern pattern = Pattern.compile("[7~8].[7~8]+");
-        Matcher matcher = pattern.matcher("7.88");
-        boolean matchFound = matcher.matches();
-        if(matchFound) {
-          System.out.println("Match found");
-        } else {
-          System.out.println("Match not found");
-        }*/
-        
-        Interfaz Log=new Interfaz(); 
-        String ruta="C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\prueba.exp";
-        
+
+        Interfaz Log = new Interfaz();
+        String ruta = "C:\\Users\\justin\\Desktop\\USAC\\2022\\primerSemestre\\COMPI1\\OLC-Proyecto1_202004734\\[OLC]Proyecto1_202004734\\prueba.exp";
+
     }
-    
+
 }

@@ -10,6 +10,7 @@ package Analizadores;
  * @author justin
  */
 public class TError {
+
     String tipo, lexema, descripcion;
     int linea, columna;
 
@@ -17,11 +18,11 @@ public class TError {
         this.tipo = tipo;
         this.lexema = lexema;
         this.descripcion = descripcion;
-        this.linea = linea+1;
-        this.columna = columna+1;
+        this.linea = linea + 1;
+        this.columna = columna + 1;
     }
-            
-     public String show() {
+
+    public String show() {
         String data = "";
         data += "\ntipo:" + tipo;
         data += "\nlexema:" + lexema;
@@ -30,22 +31,18 @@ public class TError {
         data += "\ncolumna:" + String.valueOf(columna);
         return data;
     }
-     
-     
-     public String getLexema() {
+
+    public String getLexema() {
         return lexema;
     }
-
 
     public int getLine() {
         return linea;
     }
 
-
     public int getColumn() {
         return columna;
     }
-
 
     public String getDescripcion() {
         return descripcion;

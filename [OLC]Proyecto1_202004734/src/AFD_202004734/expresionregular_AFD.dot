@@ -1,7 +1,0 @@
-digraph G {
-label = "AFD DE expresionregular"
-S0 -> S1[label="\"a\""]
-S1 -> S1[label="impar"]
-S1 -> S1[label="letrac"]
-S1 -> S2[label="\"b\""]
-}

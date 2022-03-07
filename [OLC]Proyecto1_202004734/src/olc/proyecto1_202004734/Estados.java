@@ -12,23 +12,23 @@ import java.util.ArrayList;
  * @author justin
  */
 public class Estados {
- String estado;
- ArrayList <Nodos> hojas;
- String id;
- int hoja;
- 
- public Estados(String estado,String id){
-    this.estado=estado;
-    hojas=new ArrayList<Nodos>();
-    this.id=id;
- }
- 
- public Estados(String estado,String id,int terminal){
-    this.estado=estado;
-    hojas=new ArrayList<Nodos>();
-    this.id=id;
-    this.hoja=terminal;
- }
- 
- 
+
+    String estado;
+    ArrayList<Nodos> hojas;
+    String id;
+    int hoja;
+
+    public Estados(String estado, String id) {
+        this.estado = estado;
+        hojas = new ArrayList<Nodos>();
+        this.id = id;
+    }
+
+    public Estados(String estado, String id, int terminal) {
+        this.estado = estado;
+        hojas = new ArrayList<Nodos>();
+        this.id = id;
+        this.hoja = terminal;
+    }
+
 }
